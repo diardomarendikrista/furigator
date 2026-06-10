@@ -21,26 +21,38 @@ export default function ValidationPanel({
   const needsTokens = validationTokens.filter((t) => t.needsFurigana);
   const confirmedCount = needsTokens.filter((t) => t.confirmed).length;
   const totalNeeds = needsTokens.length;
-  const progress = totalNeeds > 0 ? Math.round((confirmedCount / totalNeeds) * 100) : 100;
+  const progress =
+    totalNeeds > 0 ? Math.round((confirmedCount / totalNeeds) * 100) : 100;
 
   return (
-    <div className="vp-overlay" onClick={onClose}>
-      <div className="vp-panel" onClick={(e) => e.stopPropagation()}>
+    <div className="vp-overlay">
+      <div
+        className="vp-panel"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Header */}
         <div className="vp-header">
           <div className="vp-title">
-            ✦ Furigana Validation
+            Furigana Validation
             <span className="vp-source-tag">
               {validationSource === "input" ? "Simple Input" : "Editor Output"}
             </span>
           </div>
-          <button className="vp-close" onClick={onClose}>✕</button>
+          <button
+            className="vp-close"
+            onClick={onClose}
+          >
+            ✕
+          </button>
         </div>
 
         {/* Progress bar */}
         <div className="vp-progress-wrap">
           <div className="vp-progress-bar">
-            <div className="vp-progress-fill" style={{ width: progress + "%" }} />
+            <div
+              className="vp-progress-fill"
+              style={{ width: progress + "%" }}
+            />
           </div>
           <span className="vp-progress-label">
             {confirmedCount}/{totalNeeds} confirmed
@@ -49,10 +61,21 @@ export default function ValidationPanel({
 
         {/* Legend */}
         <div className="vp-legend">
-          <span><span className="vp-dot vp-dot-warn" />Needs review</span>
-          <span><span className="vp-dot vp-dot-ok" />Confirmed</span>
-          <span><span className="vp-dot vp-dot-gray" />No furigana</span>
-          <span className="vp-legend-hint">Edit = edit reading · ✕ = remove furigana</span>
+          <span>
+            <span className="vp-dot vp-dot-warn" />
+            Needs review
+          </span>
+          <span>
+            <span className="vp-dot vp-dot-ok" />
+            Confirmed
+          </span>
+          <span>
+            <span className="vp-dot vp-dot-gray" />
+            No furigana
+          </span>
+          <span className="vp-legend-hint">
+            Edit = edit reading · ✕ = remove furigana
+          </span>
         </div>
 
         {/* Tokens */}
@@ -86,14 +109,23 @@ export default function ValidationPanel({
 
         {/* Actions */}
         <div className="vp-actions">
-          <button className="vp-btn vp-btn-ghost" onClick={onClose}>
+          <button
+            className="vp-btn vp-btn-ghost"
+            onClick={onClose}
+          >
             Cancel
           </button>
-          <button className="vp-btn vp-btn-secondary" onClick={onConfirmAll}>
+          <button
+            className="vp-btn vp-btn-secondary"
+            onClick={onConfirmAll}
+          >
             Confirm All
           </button>
-          <button className="vp-btn vp-btn-primary" onClick={onApply}>
-            ▶ Apply to Output
+          <button
+            className="vp-btn vp-btn-primary"
+            onClick={onApply}
+          >
+            Apply to Output
           </button>
         </div>
       </div>

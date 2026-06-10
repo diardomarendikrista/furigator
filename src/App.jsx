@@ -262,19 +262,14 @@ function App() {
       className="app-root"
       onClick={closeAllEditing}
     >
-      <h2 style={{ textAlign: "center" }}>Kanji To Furigana</h2>
+      <h1 className="app-title">Kanji To Furigana</h1>
 
       {/* Simple input */}
       <input
         value={text}
         onChange={handleTextChange}
         placeholder="例: 日本語を勉強します"
-        style={{
-          padding: 8,
-          fontSize: 16,
-          width: "100%",
-          boxSizing: "border-box",
-        }}
+        className="main-input"
         disabled={loading}
       />
 
@@ -289,7 +284,7 @@ function App() {
             onClick={openInputValidation}
             disabled={!tokenizer || !text}
           >
-            ✦ Validate Furigana
+            Validate Furigana
           </button>
         </div>
       )}
@@ -300,10 +295,12 @@ function App() {
           editorState={editorState}
           onEditorStateChange={onEditorStateChange}
           editorStyle={{
-            minHeight: 120,
-            border: "1px solid #ddd",
-            padding: 8,
+            minHeight: 150,
+            padding: 16,
             overflow: "auto",
+            background: "#fff",
+            border: "2px solid #1A1A1A",
+            borderTop: "none"
           }}
           toolbar={{
             options: ["inline", "list", "history", "textAlign"],
@@ -332,7 +329,7 @@ function App() {
                   onClick={openEditorValidation}
                   disabled={isEmptyHTML(pendingEditorHtml) || !tokenizer}
                 >
-                  ✦ Validate
+                  Validate
                 </button>
                 <button
                   className="btn-sm"
