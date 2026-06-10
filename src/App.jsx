@@ -6,12 +6,12 @@ import parse from "html-react-parser";
 import { renderToStaticMarkup } from "react-dom/server";
 
 // ── imports from newly created modules
+import { kataToHira, hasKanji, parseFurigana } from "./utils/helpers";
 import {
-  kataToHira,
-  hasKanji,
-  parseFurigana
-} from "./utils/helpers";
-import { buildValidationTokens, validationTokensToHtml, applyTokensToHtmlTree } from "./validation/logic";
+  buildValidationTokens,
+  validationTokensToHtml,
+  applyTokensToHtmlTree,
+} from "./validation/logic";
 import ValidationPanel from "./validation/ValidationPanel";
 import Toast from "./components/Toast";
 
@@ -40,7 +40,10 @@ function App() {
   useEffect(() => {
     setLoading(true);
     window.kuromoji.builder({ dicPath: "/dict/" }).build((err, t) => {
-      if (err) { console.error(err); return; }
+      if (err) {
+        console.error(err);
+        return;
+      }
       setTokenizer(t);
       setLoading(false);
     });
@@ -54,20 +57,26 @@ function App() {
    */
   const renderTokens = (toks, type) =>
     toks.flatMap((t, i) => {
-      if (hasKanji(t.surface_form) && t.reading && kataToHira(t.reading) !== t.surface_form) {
+      if (
+        hasKanji(t.surface_form) &&
+        t.reading &&
+        kataToHira(t.reading) !== t.surface_form
+      ) {
         const parts = parseFurigana(t.surface_form, kataToHira(t.reading));
         return parts.map((p, pIdx) =>
           p.isRuby ? (
-            <ruby key={`${i}-${type}-${pIdx}`} style={{ marginRight: 4, cursor: "pointer" }}>
+            <ruby
+              key={`${i}-${type}-${pIdx}`}
+              style={{ marginRight: 4, cursor: "pointer" }}
+            >
               {p.text}
               <rt style={{ fontSize: "0.6em" }}>{p.ruby}</rt>
             </ruby>
-          ) : (
-            <span key={`${i}-${type}-${pIdx}`}>{p.text}</span>
-          )
+          ) : p.text,
         );
       }
-      return <ruby key={`${i}-${type}`}>{t.surface_form}</ruby>;
+      // Non-kanji tokens → plain text, no wrapper needed
+      return t.surface_form;
     });
 
   // Simple input
@@ -127,7 +136,7 @@ function App() {
         if (domNode.type === "text" && domNode.data.trim() !== "") {
           allMorphemes = allMorphemes.concat(tokenizer.tokenize(domNode.data));
         }
-      }
+      },
     });
     setValidationTokens(buildValidationTokens(allMorphemes));
     setValidationSource("editor");
@@ -139,7 +148,9 @@ function App() {
    */
   const confirmToken = useCallback((id) => {
     setValidationTokens((prev) =>
-      prev.map((t) => (t.id === id ? { ...t, confirmed: true, editing: false } : t))
+      prev.map((t) =>
+        t.id === id ? { ...t, confirmed: true, editing: false } : t,
+      ),
     );
   }, []);
 
@@ -149,8 +160,10 @@ function App() {
   const skipToken = useCallback((id) => {
     setValidationTokens((prev) =>
       prev.map((t) =>
-        t.id === id ? { ...t, needsFurigana: false, confirmed: true, editing: false } : t
-      )
+        t.id === id
+          ? { ...t, needsFurigana: false, confirmed: true, editing: false }
+          : t,
+      ),
     );
   }, []);
 
@@ -163,8 +176,14 @@ function App() {
         if (t.id !== id) return { ...t, editing: false };
         if (newReading === null) return { ...t, editing: !t.editing };
         const trimmed = newReading.trim();
-        return { ...t, reading: trimmed, needsFurigana: trimmed !== "", confirmed: true, editing: false };
-      })
+        return {
+          ...t,
+          reading: trimmed,
+          needsFurigana: trimmed !== "",
+          confirmed: true,
+          editing: false,
+        };
+      }),
     );
   }, []);
 
@@ -173,7 +192,7 @@ function App() {
    */
   const confirmAll = useCallback(() => {
     setValidationTokens((prev) =>
-      prev.map((t) => ({ ...t, confirmed: true, editing: false }))
+      prev.map((t) => ({ ...t, confirmed: true, editing: false })),
     );
   }, []);
 
@@ -190,7 +209,7 @@ function App() {
    */
   const closeAllEditing = useCallback(() => {
     setValidationTokens((prev) =>
-      prev ? prev.map((t) => ({ ...t, editing: false })) : prev
+      prev ? prev.map((t) => ({ ...t, editing: false })) : prev,
     );
   }, []);
 
@@ -203,7 +222,11 @@ function App() {
     let html = "";
     if (validationSource === "editor") {
       // Deeply replace text nodes in the original HTML structure keeping tags intact
-      html = applyTokensToHtmlTree(pendingEditorHtml, validationTokens, tokenizer);
+      html = applyTokensToHtmlTree(
+        pendingEditorHtml,
+        validationTokens,
+        tokenizer,
+      );
     } else {
       // Simple inputs don't have HTML tags, so we can just use the flat string method
       html = validationTokensToHtml(validationTokens);
@@ -214,7 +237,6 @@ function App() {
     setValidationTokens(null);
     setValidationSource(null);
   }, [validationTokens, validationSource, pendingEditorHtml, tokenizer]);
-
 
   /**
    * Utility to copy text to system clipboard.
@@ -232,10 +254,14 @@ function App() {
   /**
    * Helper to check if an HTML string effectively contains no readable text.
    */
-  const isEmptyHTML = (html) => !html || html.replace(/<[^>]*>/g, "").trim().length === 0;
+  const isEmptyHTML = (html) =>
+    !html || html.replace(/<[^>]*>/g, "").trim().length === 0;
 
   return (
-    <div className="app-root" onClick={closeAllEditing}>
+    <div
+      className="app-root"
+      onClick={closeAllEditing}
+    >
       <h2 style={{ textAlign: "center" }}>Kanji To Furigana</h2>
 
       {/* Simple input */}
@@ -243,7 +269,12 @@ function App() {
         value={text}
         onChange={handleTextChange}
         placeholder="例: 日本語を勉強します"
-        style={{ padding: 8, fontSize: 16, width: "100%", boxSizing: "border-box" }}
+        style={{
+          padding: 8,
+          fontSize: 16,
+          width: "100%",
+          boxSizing: "border-box",
+        }}
         disabled={loading}
       />
 
@@ -268,7 +299,12 @@ function App() {
         <Editor
           editorState={editorState}
           onEditorStateChange={onEditorStateChange}
-          editorStyle={{ minHeight: 120, border: "1px solid #ddd", padding: 8, overflow: "auto" }}
+          editorStyle={{
+            minHeight: 120,
+            border: "1px solid #ddd",
+            padding: 8,
+            overflow: "auto",
+          }}
           toolbar={{
             options: ["inline", "list", "history", "textAlign"],
             inline: { options: ["bold", "italic", "underline"] },
@@ -307,7 +343,14 @@ function App() {
                 </button>
               </div>
             </div>
-            <div style={{ marginTop: 8, whiteSpace: "pre-wrap", wordBreak: "break-word", fontSize: "0.9rem" }}>
+            <div
+              style={{
+                marginTop: 8,
+                whiteSpace: "pre-wrap",
+                wordBreak: "break-word",
+                fontSize: "0.9rem",
+              }}
+            >
               {plainHTML}
             </div>
           </div>
@@ -334,7 +377,10 @@ function App() {
       )}
 
       {/* Toast Notification */}
-      <Toast message={toastMessage} onClose={() => setToastMessage("")} />
+      <Toast
+        message={toastMessage}
+        onClose={() => setToastMessage("")}
+      />
     </div>
   );
 }

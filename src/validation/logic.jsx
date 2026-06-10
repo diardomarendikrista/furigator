@@ -42,7 +42,8 @@ export function validationTokensToHtml(tokens) {
           )
           .join("");
       }
-      return `<ruby>${escHtml(t.surface)}</ruby>`;
+      // Non-kanji token → plain text, no ruby wrapper
+      return escHtml(t.surface);
     })
     .join("");
 }
@@ -85,12 +86,11 @@ export function applyTokensToHtmlTree(htmlSource, validatedTokens, tokenizer) {
                   {p.text}
                   <rt style={{ fontSize: "0.6em" }}>{p.ruby}</rt>
                 </ruby>
-              ) : (
-                <span key={`${idx}-${pIdx}`}>{p.text}</span>
-              )
+              ) : p.text  // okurigana → plain text
             );
           }
-          return <ruby key={idx}>{t.surface}</ruby>;
+          // Non-kanji token → plain text string, no ruby
+          return t.surface;
         });
 
         // Return the React fragment. `html-react-parser` will swap the raw text node with this.
