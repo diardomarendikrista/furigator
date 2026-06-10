@@ -11,7 +11,7 @@ import {
   hasKanji,
   parseFurigana
 } from "./utils/helpers";
-import { buildValidationTokens, validationTokensToHtml } from "./validation/logic";
+import { buildValidationTokens, validationTokensToHtml, applyTokensToHtmlTree } from "./validation/logic";
 import ValidationPanel from "./validation/ValidationPanel";
 import Toast from "./components/Toast";
 
@@ -203,7 +203,6 @@ function App() {
     let html = "";
     if (validationSource === "editor") {
       // Deeply replace text nodes in the original HTML structure keeping tags intact
-      const { applyTokensToHtmlTree } = require('./validation/logic');
       html = applyTokensToHtmlTree(pendingEditorHtml, validationTokens, tokenizer);
     } else {
       // Simple inputs don't have HTML tags, so we can just use the flat string method
